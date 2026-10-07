@@ -88,10 +88,3 @@ def update_markers(payload: dict = Body(...), db: Session = Depends(get_db)):
 
     all_rows = db.scalars(select(Ingredient).order_by(Ingredient.id)).all()
     return {"updated": len(markers), **_inventory_payload(list(all_rows))}
-
-
-def frozen_pool_hint(db) -> float:
-    from app.models.models import Ingredient
-    from sqlalchemy import select as _sel
-    rows = db.scalars(_sel(Ingredient)).all()
-    return round(sum(float(r.stock_qty) for r in rows if getattr(r, "storage_type", "") == "frozen"), 3)

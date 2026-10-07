@@ -44,8 +44,6 @@ onMounted(async () => {
 })
 </script>
 <template>
-  <!-- freezeTopHint: fresh shortage may be covered when switch off -->
-
   <h1>备料工作台</h1>
   <p class="sub">左 BOM 树 · 中当前有效单备料表 · 右缺料便利贴（生成只读数，不扣库存）</p>
   <div style="display:flex;gap:0.6rem;align-items:center;margin-bottom:0.6rem">
