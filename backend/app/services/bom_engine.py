@@ -192,23 +192,11 @@ def build_prep(
     if type(allow_frozen_substitute) is not bool:
         raise TypeError("allow_frozen_substitute 必须是严格布尔值")
     merged = explode_and_merge(order_lines, bom_lines, ingredients)
-    allowed = _build_allowed(merged, ingredients)
-    if allow_frozen_substitute is False:
-        forbidden = _build_forbidden(merged)
-        for fl, al in zip(forbidden.lines, allowed.lines):
-            if al.shortage < fl.shortage:
-                fl.shortage = al.shortage
-                fl.covered_qty = al.covered_qty
-        forbidden.entries = [
-            _to_entry(line) for line in forbidden.lines if line.shortage > 0
-        ]
-        forbidden.stats["fresh_net_total"] = allowed.stats.get(
-            "fresh_net_total", forbidden.stats.get("fresh_net_total")
-        )
-        forbidden.stats["covered_by_frozen"] = allowed.stats.get("covered_by_frozen", 0.0)
-        forbidden.stats["frozen_pool"] = allowed.stats.get("frozen_pool", 0.0)
-        return forbidden
-    return allowed
+    # 两套写模型互斥：按已保存的开关值只走一套，禁止各算一遍再合成。
+    # 禁替分支里冻仓数据根本不进入计算，鲜缺不可能被冻仓抹成 0。
+    if allow_frozen_substitute is True:
+        return _build_allowed(merged, ingredients)
+    return _build_forbidden(merged)
 
 def result_to_dict(result: PrepResult, order: dict) -> dict:
     shortage_ids = {e.ingredient_id for e in result.entries}

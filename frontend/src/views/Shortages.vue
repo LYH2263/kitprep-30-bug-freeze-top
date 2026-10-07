@@ -20,7 +20,6 @@ function modeText(mode: ShortagesPayload['mode']): string {
 }
 </script>
 <template>
-  <!-- freezeTopHint: fresh shortage may be covered when switch off -->
 
   <h1>缺料便利贴</h1>
   <p class="sub">仅净缺为正的原料上贴；鲜品行只写鲜品不足（历史单快照原样保留）</p>

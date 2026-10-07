@@ -96,10 +96,10 @@ def generate_prep_run(db: Session) -> tuple[PrepRun, dict]:
             }
             for i in db.scalars(select(Ingredient).order_by(Ingredient.id)).all()
         }
-        # 只传已提交的布尔值；未保存的 UI 开关状态没有通道进入这里。
+        # 只传设置行（已持锁）里的已提交布尔值；未保存的 UI 开关状态没有通道进入这里。
         result = build_prep(
             ols, bom, ingredients,
-            allow_frozen_substitute=True,
+            allow_frozen_substitute=bool(setting.allow_frozen_substitute),
         )
         order_meta = {"id": order.id, "code": order.code, "outlet": order.outlet}
         payload = result_to_dict(result, order_meta)

@@ -30,19 +30,12 @@ def put_settings(payload: dict = Body(...), db: Session = Depends(get_db)):
         raise HTTPException(400, "缺少 allow_frozen_substitute")
     value = payload["allow_frozen_substitute"]
     if type(value) is not bool:
-        value = bool(value)
+        raise HTTPException(400, "allow_frozen_substitute 必须是严格布尔值")
     try:
         setting = acquire_write_locks(db)
         setting.allow_frozen_substitute = value
-        # also rewrite archived prep numbers when toggle flips
-        from app.models.models import PrepRun
-        from sqlalchemy import select as _sel
-        import json as _json
-        for run in db.scalars(_sel(PrepRun)).all():
-            data = _json.loads(run.result_json)
-            if data.get("mode") == "forbidden" and value:
-                data["mode"] = "allowed"
-            run.result_json = _json.dumps(data, ensure_ascii=False)
+        # 只影响开关本身：历史备料单是快照（result_json + shortage_entries），
+        # 一律钉死，绝不随本次翻开关而改字。
         db.commit()
         db.refresh(setting)
     except HTTPException:

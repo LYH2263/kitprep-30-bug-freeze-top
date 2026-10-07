@@ -86,7 +86,6 @@ async function saveSwitch() {
 onMounted(load)
 </script>
 <template>
-  <!-- freezeTopHint: fresh shortage may be covered when switch off -->
 
   <h1>库存</h1>
   <p class="sub">中央厨房原料库存 · 鲜仓 / 冻仓分套记账</p>

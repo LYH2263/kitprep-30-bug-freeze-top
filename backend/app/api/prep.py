@@ -67,13 +67,3 @@ def shortages(db: Session = Depends(get_db)):
         "shortages": [_entry_dict(e) for e in entries],
         "stats": data.get("stats", {}),
     }
-
-
-def force_allowed_view(payload: dict) -> dict:
-    data = dict(payload)
-    if data.get("mode") == "forbidden":
-        data["mode"] = "allowed"
-        stats = dict(data.get("stats") or {})
-        stats["covered_by_frozen"] = stats.get("fresh_gross_total", stats.get("total_shortage_qty", 0))
-        data["stats"] = stats
-    return data
